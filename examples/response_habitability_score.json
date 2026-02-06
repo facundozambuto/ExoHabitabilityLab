@@ -1,0 +1,39 @@
+{
+  "exoplanet_id": 1,
+  "exoplanet_name": "Kepler-442 b",
+  "total_score": 0.8234,
+  "score_category": "Very High",
+  "factors": [
+    {
+      "factor_name": "stellar_type",
+      "score": 0.85,
+      "weight": 0.3,
+      "weighted_contribution": 0.255,
+      "input_value": "K5V",
+      "explanation": "K-type star (K5V): Slightly cooler than Sun. Excellent habitability potential with very stable luminosity and extended lifetime (15-30+ billion years). Reduced UV flux.",
+      "confidence": "high"
+    },
+    {
+      "factor_name": "planet_radius",
+      "score": 0.85,
+      "weight": 0.35,
+      "weighted_contribution": 0.2975,
+      "input_value": "1.34 R⊕",
+      "explanation": "Planet radius (1.34 R⊕) indicates a super-Earth. Likely rocky composition with potentially thicker atmosphere. May have higher surface gravity but still potentially habitable.",
+      "confidence": "high"
+    },
+    {
+      "factor_name": "equilibrium_temperature",
+      "score": 0.92,
+      "weight": 0.35,
+      "weighted_contribution": 0.322,
+      "input_value": "233 K",
+      "explanation": "Equilibrium temperature (233 K) is within the optimal range for liquid water (230-310 K). With an appropriate atmospheric greenhouse effect, surface conditions could support liquid water. Earth's equilibrium temperature is ~255 K.",
+      "confidence": "medium"
+    }
+  ],
+  "data_completeness": 1.0,
+  "missing_parameters": [],
+  "scientific_disclaimer": "IMPORTANT: This habitability score is a probabilistic indicator based on limited astrophysical parameters. It does NOT indicate the presence of life or guarantee conditions suitable for life as we know it. Many factors essential for habitability (atmospheric composition, magnetic field, geological activity, etc.) cannot be determined from current observational data. This score should be interpreted as a rough estimate of Earth-like conditions only.",
+  "methodology_summary": "The habitability score is computed using a weighted combination of factors: stellar type (spectral class favorability for stable habitable zones), planet radius (likelihood of rocky composition), and equilibrium temperature (proximity to liquid water temperature range). Each factor is normalized to 0-1 and combined using scientifically-informed weights."
+}
