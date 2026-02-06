@@ -75,7 +75,7 @@ app/
 ## 🔧 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ExoHabitabilityLab.git
+git clone https://github.com/facundozambuto/ExoHabitabilityLab.git
 cd ExoHabitabilityLab
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
