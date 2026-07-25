@@ -397,7 +397,9 @@ class PollinationsImageService(ImageGenerationService):
     Authentication via Bearer token in Authorization header.
     """
     
-    BASE_URL = "https://gen.pollinations.ai/image/"
+    # Free anonymous endpoint (no API key required). The paid gen.pollinations.ai
+    # endpoint returns 401 without a token, so we default to the public one.
+    BASE_URL = "https://image.pollinations.ai/prompt/"
     
     def __init__(
         self, 
@@ -430,7 +432,7 @@ class PollinationsImageService(ImageGenerationService):
         encoded_prompt = quote(prompt)
         return (
             f"{self.BASE_URL}{encoded_prompt}"
-            f"?model={self.model}&width={width}&height={height}&seed={seed}&enhance=false"
+            f"?model={self.model}&width={width}&height={height}&seed={seed}&enhance=false&nologo=true"
         )
     
     async def generate(self, prompt: str, negative_prompt: str, style: ImageStyle, format: ImageFormat) -> Dict[str, Any]:
@@ -440,7 +442,22 @@ class PollinationsImageService(ImageGenerationService):
         
         image_url = self._build_url(prompt, width, height, seed)
         headers = self._get_headers()
-        
+
+        # Serverless-friendly path: when no external storage is configured we
+        # skip the (slow, timeout-prone) server-side download and return the
+        # direct Pollinations URL. Opening it renders the image on demand.
+        if isinstance(self.storage, NoStorageService):
+            return {
+                "generation_id": generation_id,
+                "status": "completed",
+                "url": image_url,
+                "direct_url": image_url,
+                "provider": "pollinations.ai",
+                "model": self.model,
+                "width": width,
+                "height": height,
+            }
+
         try:
             async with httpx.AsyncClient(
                 timeout=120.0, 

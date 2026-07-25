@@ -49,6 +49,14 @@ class Settings(BaseSettings):
     
     # API Configuration
     api_v1_prefix: str = "/api/v1"
+
+    # CORS - comma-separated list of allowed origins ("*" for all)
+    cors_allow_origins: str = "*"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Parse the comma-separated CORS origins into a list."""
+        return [o.strip() for o in self.cors_allow_origins.split(",") if o.strip()]
     
     # Logging
     log_level: str = "INFO"
@@ -60,7 +68,7 @@ class Settings(BaseSettings):
     # Image Generation Configuration
     # Provider options: "pollinations" (free), "dalle" (OpenAI), "stability" (Stability AI)
     image_provider: str = "pollinations"
-    pollinations_api_key: str = "pk_NGG18T1EUVVmvVBz"  # Optional - for gen.pollinations.ai (get free key at enter.pollinations.ai)
+    pollinations_api_key: str = ""  # Optional - for gen.pollinations.ai (get free key at enter.pollinations.ai)
     openai_api_key: str = ""  # Required for DALL-E
     stability_api_key: str = ""  # Required for Stability AI
     

@@ -210,3 +210,5 @@ __marimo__/
 exohabitability.db
 *.db
 .env
+.vercel
+.env*
