@@ -115,6 +115,58 @@ async def list_exoplanets(
 
 
 @router.get(
+    "/ranking/top",
+    summary="Top Habitable Exoplanets",
+    description="Score every exoplanet in the database and return the most habitable, ranked.",
+)
+async def get_top_habitable(
+    db: DbSession,
+    scorer: HabitabilityScorer,
+    limit: int = Query(10, ge=1, le=100, description="Number of planets to return"),
+) -> JSONResponse:
+    """
+    Compute the habitability score for all exoplanets and return the top `limit`
+    ranked from most to least habitable. Scoring is pure computation (no external
+    calls) so this is fast even for the whole catalogue.
+    """
+    result = await db.execute(select(Exoplanet))
+    exoplanets = result.scalars().all()
+
+    ranked = []
+    for ep in exoplanets:
+        try:
+            score = scorer.calculate_score(ep)
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning(f"Scoring failed for {ep.name}: {exc}")
+            continue
+        ranked.append(
+            {
+                "id": ep.id,
+                "name": ep.name,
+                "host_star": ep.host_star,
+                "stellar_type": ep.stellar_type,
+                "planet_radius_earth": ep.planet_radius_earth,
+                "equilibrium_temp_k": ep.equilibrium_temp_k,
+                "discovery_year": ep.discovery_year,
+                "distance_pc": ep.distance_pc,
+                "total_score": score.total_score,
+                "score_category": score.score_category,
+                "data_completeness": score.data_completeness,
+            }
+        )
+
+    ranked.sort(key=lambda x: x["total_score"], reverse=True)
+
+    return JSONResponse(
+        content={
+            "count": len(ranked[:limit]),
+            "total_scored": len(ranked),
+            "items": ranked[:limit],
+        }
+    )
+
+
+@router.get(
     "/{exoplanet_id}",
     response_model=ExoplanetResponse,
     summary="Get Exoplanet Details",
