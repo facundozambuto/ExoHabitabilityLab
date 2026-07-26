@@ -167,6 +167,28 @@ async def get_top_habitable(
 
 
 @router.get(
+    "/{exoplanet_id}/astrophysics",
+    summary="Advanced Astrophysics (Astropy)",
+    description="Research-grade derived quantities: Kopparapu habitable zone, instellation, "
+    "equilibrium temperature, Earth Similarity Index, surface gravity/escape velocity, "
+    "galactic coordinates, transit depth and radial-velocity semi-amplitude.",
+)
+async def get_astrophysics(exoplanet_id: int, db: DbSession) -> JSONResponse:
+    """Compute an Astropy-powered astrophysics report for a single exoplanet."""
+    result = await db.execute(select(Exoplanet).where(Exoplanet.id == exoplanet_id))
+    exoplanet = result.scalar_one_or_none()
+    if not exoplanet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Exoplanet with ID {exoplanet_id} not found",
+        )
+    # Imported lazily so the heavy Astropy stack only loads for this endpoint.
+    from app.services.astrophysics import compute_all
+
+    return JSONResponse(content=compute_all(exoplanet))
+
+
+@router.get(
     "/{exoplanet_id}",
     response_model=ExoplanetResponse,
     summary="Get Exoplanet Details",
