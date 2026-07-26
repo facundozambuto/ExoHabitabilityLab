@@ -12,6 +12,21 @@ The project combines astrophysics, open data, and software engineering to create
 
 ---
 
+## 🌐 Live Demo
+
+| | Link |
+|---|---|
+| 🪐 **Web app (UI)** | **https://exohabitability-ui.vercel.app** |
+| ⚙️ **API** | https://exohabitabilitylab.vercel.app |
+| 📖 **API docs (Swagger)** | https://exohabitabilitylab.vercel.app/docs |
+
+The project is split into two repositories, both deployed on **Vercel** (API on serverless Python + **Neon Postgres**, UI as a static SPA):
+
+- **Backend API** — this repo.
+- **Frontend UI** — a space-themed **Angular 19** app: [ExoHabitabilityLab-UI](https://github.com/facundozambuto/ExoHabitabilityLab-UI). Animated starfield, ambient soundscape, habitability leaderboard, search, planet detail, AI image generation, side-by-side comparison and an **Astrophysics Lab**.
+
+---
+
 ## 🚀 Project Overview
 
 The goal of ExoHabitabilityLab is to:
@@ -34,6 +49,25 @@ The goal of ExoHabitabilityLab is to:
 - 🎨 **AI Image Generation** - Create artistic visualizations of exoplanets
 - ⚡ **High Performance** - Async API with intelligent caching
 - 📊 **Detailed Explanations** - Scientific reasoning for every score
+- ⚛️ **Astrophysics Lab (Astropy)** - Research-grade derived quantities per planet (see below)
+- 🖥️ **Space-themed Web UI** - Angular 19 companion app to explore everything visually
+
+### ⚛️ Astrophysics Lab (Astropy)
+
+The `GET /api/v1/exoplanets/{id}/astrophysics` endpoint uses **[Astropy](https://www.astropy.org/)** to derive
+research-grade quantities from the catalogue parameters:
+
+| Quantity | Method / reference |
+|----------|--------------------|
+| **Habitable-zone boundaries** | Conservative & optimistic edges — Kopparapu et al. (2014) |
+| **Instellation & equilibrium temperature** | Incident flux (S⊕) and T_eq for several Bond albedos |
+| **Earth Similarity Index (ESI)** | Schulze-Makuch et al. (2011) |
+| **Surface gravity / escape velocity / density** | Astropy constants |
+| **Galactic coordinates (ℓ, b)** | ICRS → Galactic via `astropy.coordinates.SkyCoord` |
+| **Transit depth & radial-velocity semi-amplitude** | Detectability of the planet |
+| **Host-star blackbody peak** | Wien's law + approximate colour |
+
+> Astropy is imported lazily so it only loads for this route, keeping the rest of the serverless API light.
 
 ### Scoring Factors
 | Category | Factor | Description |
@@ -56,13 +90,14 @@ The goal of ExoHabitabilityLab is to:
 
 ## 🛠 Tech Stack
 
-- **Runtime**: Python 3.11+
+- **Runtime**: Python 3.11+ (3.12 on Vercel)
 - **Framework**: FastAPI with async support
 - **Validation**: Pydantic v2
-- **Database**: SQLAlchemy async + SQLite
-- **Caching**: In-memory or Redis
+- **Database**: SQLAlchemy async — SQLite locally, **Neon Postgres** in production
+- **Astronomy**: Astropy (advanced astrophysics endpoint)
 - **Testing**: pytest + pytest-asyncio
-- **Astronomy**: Astropy
+- **Frontend**: Angular 19 SPA ([separate repo](https://github.com/facundozambuto/ExoHabitabilityLab-UI))
+- **Hosting**: Vercel (serverless Python + static SPA)
 
 ---
 
@@ -202,7 +237,9 @@ curl -X POST http://localhost:8000/api/v1/exoplanets/sync/esa
 | `/api/v1/exoplanets`              | GET    | List exoplanets (paginated)    |
 | `/api/v1/exoplanets/{id}`         | GET    | Get exoplanet details          |
 | `/api/v1/exoplanets/{id}/score`   | GET    | Get habitability score         |
+| `/api/v1/exoplanets/{id}/astrophysics` | GET | Astropy-derived astrophysics (HZ, ESI, galactic coords…) |
 | `/api/v1/exoplanets/{id}/generate-art` | POST | Generate AI visualization |
+| `/api/v1/exoplanets/ranking/top`  | GET    | Top habitable planets, ranked  |
 | `/api/v1/exoplanets/scoring/methodology` | GET | Scoring methodology info |
 | `/api/v1/exoplanets/sync/nasa`    | POST   | Sync from NASA archive         |
 | `/api/v1/exoplanets/sync/esa`     | POST   | Sync from ESA (mock)           |
@@ -316,11 +353,13 @@ Uses heuristic indicators based on current astrophysical knowledge
 Results are educational and exploratory.
 
 🗺 Roadmap
- Frontend dashboard
- Machine learning scoring model
- Visualization of planetary systems
- Artistic planet generation
- Support for exomoons
+- [x] Frontend dashboard (Angular 19 SPA)
+- [x] Artistic planet generation (AI images)
+- [x] Advanced astrophysics (Astropy: HZ, ESI, galactic coords…)
+- [x] Habitability ranking / leaderboard
+- [ ] Machine learning scoring model
+- [ ] Visualization of planetary systems
+- [ ] Support for exomoons
 
 🤝 Contributing
 Contributions are welcome!
